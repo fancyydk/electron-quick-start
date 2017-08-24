@@ -3,6 +3,7 @@ const electron = require('electron')
 const app = electron.app
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
+const ipcMain = electron.ipcMain;
 
 const path = require('path')
 const url = require('url')
@@ -14,6 +15,10 @@ let mainWindow
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({width: 800, height: 600})
+
+  if (process.argv.indexOf('--minimize') >= 0) {
+    mainWindow.minimize();
+  }
 
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({
@@ -58,3 +63,23 @@ app.on('activate', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+let relaunch = (duration, shouldMinimize) => {
+  setTimeout(() => {
+    let args = (process.argv.indexOf('--relaunch') >= 0) ? [] : ['--relaunch'];
+    if (shouldMinimize) {
+      if (process.argv.indexOf('--minimize') < 0) {
+        args.push('--minimize');
+      }
+    } else if (process.argv.indexOf('--minimize') >= 0) {
+      process.argv.splice(process.argv.indexOf('--minimize'), 1);
+    }
+    app.relaunch({args: process.argv.slice(1).concat(args)});
+    app.exit(0);
+  }, duration);
+};
+
+ipcMain.on('restartInFive', (event, shouldMinimize) => {
+  console.log('restartInFive - ' + shouldMinimize);
+  relaunch(5000, shouldMinimize);
+});
