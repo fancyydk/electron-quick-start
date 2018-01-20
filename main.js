@@ -3,6 +3,8 @@ const electron = require('electron')
 const app = electron.app
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
+const ipcMain = electron.ipcMain;
+const dialog = electron.dialog;
 
 const path = require('path')
 const url = require('url')
@@ -32,7 +34,21 @@ function createWindow () {
     // when you should delete the corresponding element.
     mainWindow = null
   })
+
+  mainWindow.webContents.session.on('will-download', function () {
+    showDialog('will-download from mainWindow');
+    mainWindow.webContents.send('download-start', 'mainWindow');
+  });
 }
+
+ipcMain.on('open-download-window', function (event, url) {
+  let downloadWindow = new BrowserWindow({width: 800, height: 600});
+  downloadWindow.webContents.session.on('will-download', function () {
+    showDialog('will-download from downloadWindow');
+    downloadWindow.webContents.send('download-start', 'downloadWindow');
+  });
+  downloadWindow.loadURL(url);
+});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -58,3 +74,12 @@ app.on('activate', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+function showDialog(message) {
+  dialog.showMessageBox({
+    type: 'info',
+    buttons: [],
+    title: 'Message',
+    message: message
+  });
+}
