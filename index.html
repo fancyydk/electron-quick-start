@@ -11,6 +11,34 @@
     Chromium <script>document.write(process.versions.chrome)</script>,
     and Electron <script>document.write(process.versions.electron)</script>.
 
+    <br />
+    <div>
+      <h3>Zoom level</h3>
+      <button id="zoomLevelPlus">Zoom level +</button>
+      <button id="zoomLevelMinus">Zoom level -</button>
+      step: <input type="text" id="zoomLevelStep" value="1" style="width: 20px;" />
+    </div>
+    <div>
+      <h3>Zoom factor</h3>
+      <button id="zoomFactorPlus">Zoom factor +</button>
+      <button id="zoomFactorMinus">Zoom factor -</button>
+      step: <input type="text" id="zoomFactorStep" value="0.2" style="width: 20px;" />
+    </div>
+    <div>
+      <h3>Zoom reset</h3>
+      <button id="resetZoom">Reset zoom</button>
+    </div>
+    <br />
+    <div id="change" style="color: red;"></div>
+    <div style="border: 1px solid black; padding: 10px;">
+      <div>
+        Zoom level: <span id="zoomLevel"></span>
+      </div>
+      <div>
+        Zoom factor: <span id="zoomFactor"></span>
+      </div>
+    </div>
+
     <script>
       // You can also require other files to run in this process
       require('./renderer.js')

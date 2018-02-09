@@ -32,6 +32,18 @@ function createWindow () {
     // when you should delete the corresponding element.
     mainWindow = null
   })
+
+  electron.ipcMain.on('changeZoomLevel', (event, zoomLevel) => {
+    console.log('Zoom level received: ' + zoomLevel);
+    mainWindow.webContents.setZoomLevel(zoomLevel);
+    sendZoomInfo(mainWindow);
+  });
+
+  electron.ipcMain.on('changeZoomFactor', (event, zoomFactor) => {
+    console.log('Zoom factor received: ' + zoomFactor);
+    mainWindow.webContents.setZoomFactor(zoomFactor);
+    sendZoomInfo(mainWindow);
+  });
 }
 
 // This method will be called when Electron has finished
@@ -58,3 +70,14 @@ app.on('activate', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+function sendZoomInfo(window) {
+  window.webContents.getZoomLevel(zoomLevel => {
+    window.webContents.getZoomFactor(zoomFactor => {
+      console.log('Sending zoom info:');
+      console.log('  - zoom level: ' + zoomLevel);
+      console.log('  - zoom factor: ' + zoomFactor);
+      window.webContents.send('zoomChanged', zoomLevel, zoomFactor);
+    });
+  });
+}
